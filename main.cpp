@@ -67,7 +67,8 @@ int main() {
     while( true ) {
         ServerResponsePackage data = client.getTruckData();
         // Normalize the angle so that 0.0 points toward the parking lot.
-        data.angle = std::fmod( data.angle + 90, 360.0 ) - 180;
+        data.angle = std::fmod( data.angle + 90, 360.0 ) - 180.0;
+        data.x -= 0.5;
 
         double instruction = rules::rules( data.x, data.y, data.angle );
 
