@@ -22,6 +22,9 @@ public:
      * Se the documentation for details.
      */
     double intensity( double, double, double, double output_value ) const;
+    double operator()( double x, double y, double angle, double output ) const {
+        return intensity( x, y, angle, output );
+    }
 };
 
 #endif // FUZZY_RULE_H
