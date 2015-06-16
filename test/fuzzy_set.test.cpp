@@ -1,5 +1,10 @@
 #include "fuzzy_set.h"
+#include <limits>
 #include <catch.hpp>
+
+namespace {
+    constexpr double inf = std::numeric_limits<double>::infinity();
+} // anonymous namespace
 
 TEST_CASE( "FuzzySet wrong constructors", "[FuzzySet][exception]" ) {
     CHECK_THROWS( FuzzySet( 1.0, 0.0, 2.0, 3.0 ) );
@@ -40,4 +45,21 @@ TEST_CASE( "FuzzySet membership", "[FuzzySet]" ) {
     CHECK( trapezoid( 3.4 ) == Approx( 0.8 ) );
     CHECK( trapezoid( 4.0 ) == Approx( 0.5 ) );
     CHECK( trapezoid( 4.6 ) == Approx( 0.2 ) );
+}
+
+TEST_CASE( "FuzzySet membership with infinities", "[FuzzySet]" ) {
+    FuzzySet everything( -inf, -inf, inf, inf );
+    CHECK( everything(-3141592.0) == 1.0 );
+    CHECK( everything(2718281828.0) == 1.0 );
+
+    FuzzySet negative( -inf, -inf, 0, 0 );
+    CHECK( negative(-3.14) == 1.0 );
+    CHECK( negative(0.0) == 0.5 );
+    CHECK( negative(2.71828) == 0.0 );
+
+    FuzzySet large( 0, 1, inf, inf );
+    CHECK( large( 0.0 ) == 0.0 );
+    CHECK( large( 0.5 ) == Approx(0.5) );
+    CHECK( large( 1.0 ) == 1.0 );
+    CHECK( large( 196 ) == 1.0 );
 }
