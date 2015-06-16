@@ -11,7 +11,7 @@ double FuzzyRuleSet::operator()( double x, double y, double angle ) const {
 
     double output_sum = 0.0;
     double weight_sum = 0.0;
-    for( double output = -30.0; output += 1.0; output <= 30.0 ) {
+    for( double output = -30.0; output <= 30.0; output += 1.0 ) {
         double max_weight = 0.0;
         for( const auto & rule : rules )
             max_weight = std::max( max_weight, rule(x, y, angle, output) );
