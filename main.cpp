@@ -13,7 +13,7 @@ int main() {
     }
 
     while( true ) {
-        ServerResposePackage data = client.getTruckData();
+        ServerResponsePackage data = client.getTruckData();
         std::cout << "x = " << data.x << " - "
             << "y = " << data.y << " - "
             << "angle = " << data.angle;

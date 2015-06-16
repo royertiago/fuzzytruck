@@ -9,11 +9,11 @@
 #include <netdb.h>
 #include <exception>
 
-struct ServerResposePackage{
+struct ServerResponsePackage{
     double x;
     double y;
     double angle;
-    ServerResposePackage():
+    ServerResponsePackage():
         x(0),
         y(0),
         angle(0){}
@@ -36,7 +36,7 @@ private:
     int _socketfd;
     bool _debug;
 
-    inline ServerResposePackage _parseTruckData(char *raw_data);
+    inline ServerResponsePackage _parseTruckData(char *raw_data);
 
 public:
     static const char *DEFAULT_HOST;
@@ -47,7 +47,7 @@ public:
     TruckClient();
     void setDebug(bool debug);
     void conn(const char *host, const char *port);
-    ServerResposePackage getTruckData();
+    ServerResponsePackage getTruckData();
     void sendTruckInstruction(double instruction);
 };
 

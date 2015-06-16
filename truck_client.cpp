@@ -44,7 +44,7 @@ void TruckClient::conn(const char *host, const char *port) {
     }
 }
 
-ServerResposePackage TruckClient::getTruckData() {
+ServerResponsePackage TruckClient::getTruckData() {
     if(_socketfd == -1) {
         throw(TruckClientException("socket error"));
     }
@@ -58,11 +58,11 @@ ServerResposePackage TruckClient::getTruckData() {
     bytes_recieved = recv(this->_socketfd, incoming_data_buffer, 200, 0);
     if (bytes_recieved == 0) {
         if(_debug) std::cout << "host shut down." << std::endl;
-        return ServerResposePackage();
+        return ServerResponsePackage();
     }
     if (bytes_recieved == -1) {
         if(_debug) std::cout << "recieve error!" << std::endl;
-        return ServerResposePackage();
+        return ServerResponsePackage();
     }
 
     return _parseTruckData((char *)incoming_data_buffer);
@@ -81,10 +81,10 @@ void TruckClient::sendTruckInstruction(double instruction) {
     if(_debug) std::cout << "message sent: " << s << std::endl;
 }
 
-inline ServerResposePackage TruckClient::_parseTruckData(char *raw_data) {
+inline ServerResponsePackage TruckClient::_parseTruckData(char *raw_data) {
     int i, j;
     char buff[50];
-    ServerResposePackage response;
+    ServerResponsePackage response;
 
     i = 0;
     for(j = 0, buff[j] = raw_data[i];
