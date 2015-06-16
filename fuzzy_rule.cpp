@@ -6,7 +6,7 @@ FuzzyRule::FuzzyRule( FuzzySet i1, FuzzySet i2, FuzzySet i3, FuzzySet output ) :
     output( output )
 {}
 
-double FuzzyRule::intensity( double x, double y, double z, double out ) {
+double FuzzyRule::intensity( double x, double y, double z, double out ) const {
     return std::max( std::max( std::max(
         input[0](x),
         input[1](y)),

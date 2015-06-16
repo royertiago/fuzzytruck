@@ -21,7 +21,7 @@ public:
      *
      * Se the documentation for details.
      */
-    double intensity( double, double, double, double output_value );
+    double intensity( double, double, double, double output_value ) const;
 };
 
 #endif // FUZZY_RULE_H
