@@ -17,7 +17,7 @@ endef
 
 # This makefile handles multiple programs in the same directory.
 CXXFLAGS ?= -g
-ALL_CXXFLAGS := $(CXXFLAGS) -std=c++1y -iquote./
+ALL_CXXFLAGS := $(CXXFLAGS) -std=c++1y -iquote./ -isystem Catch/single_include/
 ALL_LDFLAGS := $(LDFLAGS)
 
 # Directories whose makefiles need to be included
@@ -26,7 +26,7 @@ submakefiles := $(wildcard */makefile.mk)
 # Subdirecories thad need to be ignored by find.
 # For instance, we won't scan directories with their own makefile.
 findignore := $(dir $(submakefiles))
-findignore := .git $(findignore:%/=%)
+findignore := .git Catch $(findignore:%/=%)
 findignore := $(patsubst %, -path "./%" -prune -o, $(findignore))
 
 
