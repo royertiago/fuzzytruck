@@ -7,9 +7,9 @@ namespace rules {
     constexpr double inf = std::numeric_limits<double>::infinity();
 
     // Concepts for x
-    FuzzySet left( -inf, -inf, -0.2, 0.0 );
-    FuzzySet center( -0.2, 0.0, 0.0, 0.2 );
-    FuzzySet right( 0.0, 0.2, inf, inf );
+    FuzzySet left( -inf, -inf, -0.4, 0.0 );
+    FuzzySet center( -0.4, 0.0, 0.0, 0.4 );
+    FuzzySet right( 0.0, 0.4, inf, inf );
 
     // Concepts for y
     FuzzySet far( -inf, -inf, 0.2, 0.8 );
