@@ -1,0 +1,150 @@
+\documentclass{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+
+\usepackage{amsmath}
+\usepackage{listings}
+\usepackage{tikz}
+\usetikzlibrary{positioning}
+\usetikzlibrary{shapes}
+
+\lstset{
+    basicstyle=\ttfamily
+}
+
+\begin{document}
+
+\title{
+    INE5430 --- Inteligência Artificial \\
+    FuzzyTruck --- Estacionador Fuzzy de Caminhões
+}
+\author{
+    \begin{tabular}{r l}
+        Lucas Berri Cristofolini & 12100757 \\
+        Tiago Royer & 12100776 \\
+        Wagner Fernando Gascho & 12100779
+    \end{tabular}
+}
+
+\maketitle
+
+\section{Introdução}
+
+O objetivo deste trabalho era construir um sistema fuzzy
+que fosse capaz de estacionar um caminhão.
+As entradas do sistema são a posição $(x, y)$ do caminhão
+e sua inclinação em relação ao eixo $x$,
+e a saída é uma variação nessa inclinação.
+
+Não utilizamos nenhuma biblioteca;
+fizemos nosso próprio ``raciocinador fuzzy'' em C++.
+
+Para interfacear com a interface gráfica, feita em Java,
+utilizamos os arquivos \lstinline"truck_client.h" e \lstinline"truck_client.cc"
+do repositório \lstinline"https://github.com/tarcisiofischer/fuzzytruck".
+
+Nosso código está disponível em \lstinline"https://github.com/royertiago/fuzzytruck".
+Instruções de compilação e execução estão no arquivo \lstinline"README.md".
+
+\section{Implementação do raciocinador}
+
+\subsection{Conjuntos fuzzy}
+
+Por simplicidade,
+todos os conjuntos fuzzy que utilizamos são trapezoidais.
+Eles são representados pela classe \lstinline"FuzzySet".
+Cada trapézio é parametrizado pelos quatro valores
+$le$, $lm$, $rm$, e $re$,
+esquematizados na figura \ref{trapezio}.
+
+\begin{figure}[h]
+    \centering
+    \begin{tikzpicture}
+        \draw[gray] (-1, 0) -- (4, 0);
+        \draw[thick] (-1, 0) -- (0, 0) -- (1, 1) -- (2, 1) -- (3, 0) -- (4, 0);
+        \draw[dashed] (1, 1) -- (1, 0) (2, 1) -- (2, 0);
+        \node at (0, -0.3) {$le$};
+        \node at (1, -0.3) {$lm$};
+        \node at (2, -0.3) {$rm$};
+        \node at (3, -0.3) {$re$};
+    \end{tikzpicture}
+    \caption{Conjuntos trapezoidais.}
+    \label{trapezio}
+\end{figure}
+
+Valores que estão entre $lm$ e $rm$ estão totalmente dentro do conjunto representado.
+Valores que estão após $re$ ou antes de $le$ estão totalmente fora do conjunto.
+O valor de pertinência dos demais valores é obtidos através de interpolações lineares.
+
+Observe que podemos criar conjuntos triangulares escolhendo $lm = re$,
+por exemplo.
+
+\subsection{Defuzzificação}
+
+Implementamos o algoritmo descrito no slide $39$ mostrado em aula.
+Em essência, dividimos o espaço de $-30$ a $30$ graus em $61$ valores equidistantes;
+para cada valor, procuramos qual a regra que ``mais se adequa'' àquele valor,
+e fazemos uma média ponderada com estas regras.
+
+\section{Conceitos fuzzy implementados}
+
+Escolhemos dez conjuntos fuzzy para representar os conceitos presentes no problema.
+
+Para o valor de $x$, identificamos três conjuntos importantes:
+\lstinline"left", \lstinline"center" e \lstinline"right".
+Eles representam, respectivamente,
+o fato de o caminhão estar à esquerda da sua vaga,
+o fato de o caminhão estar à direita de sua vaga,
+e o fato de o caminhão estar verticalmente alinhado à sua vaga.
+
+Para $y$, a distância entre o caminhão e o ``meio-fio'',
+fomos menos granulares:
+apenas distinguimos entre \lstinline"near" (perto)
+e \lstinline"far" (longe).
+
+E, para os ângulos entre o caminhão e o eixo $x$,
+separamos cinco conjuntos,
+que são usados tanto para entradas quanto para saídas.
+Um deles --- \lstinline"a_straight" ---
+representa o fato de o caminhão estar perfeitamente na vertical;
+dois deles --- \lstinline"a_left" e \lstinline"a_right" ---
+identificam pequenos desalinhamentos
+e outros dois --- \lstinline"a_very_left" e \lstinline"a_very_right" ---
+identificam grandes desalinhamentos.
+
+Também adicionamos um conjunto \lstinline"any",
+para representar qualquer situação.
+Ela é usada para simplificar algumas regras.
+
+\section{Regras implementadas}
+
+Implementamos 23 regras. Todas elas estão no namespace \lstinline"rules",
+no arquivo \lstinline"main.cpp".
+Por exemplo, a semãntica da regra
+\begin{lstlisting}
+    FuzzyRule( left, near, a_straight, a_right )
+\end{lstlisting}
+é que, caso o caminhão esteja à esquerda, próximo do meio fio,
+mas alinhado com a horizontal, ele deve virar à direita.
+
+As regras podem ser divididas em três grupos.
+O primeiro grupo (constituído das seis primeiras regras)
+lidam com o evento de o caminhão estar muito desalinhado com a vertical;
+estas regras tratam de orientá-lo para que fique alinhado.
+
+O segundo grupo (as oito regras seguintes)
+dão as instruções para quando o caminhão estiver longe do meio fio.
+Neste caso, mesmo que o caminhão esteja pouco desalinhado,
+iremos fazer com que o caminhão vire bastante,
+para acelerar seu alinhamento com a vertical.
+
+Já o terceiro grupo (as oito últimas regras)
+lidam com o caminhão quando ele estiver próximo do meio fio;
+procedemos como no grupo anterior,
+mas seremos mais ``prudentes'' e não faremos viradas bruscas.
+
+Existe ainda uma regra adicional: caso o caminhão esteja no centro
+e alinhado com a vertical, basta ir para frente.
+
+\end{document}
